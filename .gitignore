@@ -1,0 +1,33 @@
+# Compiled files
+target/
+*.class
+
+# IDE files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# Application Properties - KEEP THESE OUT!
+application.properties
+application-local.properties
+application-dev.properties
+application-prod.properties
+application-test.properties
+
+# Environment files
+.env
+.env.local
+
+# Maven
+dependency-reduced-pom.xml
+
+# System files
+.DS_Store
+Thumbs.db

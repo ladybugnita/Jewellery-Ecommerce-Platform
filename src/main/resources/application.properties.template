@@ -1,0 +1,10 @@
+server.port=8080
+
+spring.data.mongodb.uri=mongodb://localhost:27017/your_database_name
+spring.data.mongodb.auto-index-creation=true
+
+jwt.secret=YOUR_STRONG_SECRET_KEY_HERE_MIN_32_CHARS
+jwt.expiration=86400000
+
+logging.level.org.springframework.data.mongodb=DEBUG
+logging.level.com.ecommerce=DEBUG
