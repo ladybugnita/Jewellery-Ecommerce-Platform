@@ -1,0 +1,132 @@
+.admin-management {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.admin-management h1 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.message {
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideIn 0.3s ease;
+}
+
+.message.success {
+  background: #e3fcef;
+  color: #00b894;
+  border: 1px solid #00b894;
+}
+
+.message.error {
+  background: #ffebee;
+  color: #ff6b6b;
+  border: 1px solid #ff6b6b;
+}
+
+.message button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.admin-card {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.admin-card h2 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.add-admin-form {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+}
+
+.add-admin-form .input-group {
+  flex: 1;
+  position: relative;
+}
+
+.add-admin-form .input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.add-admin-form input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.add-admin-form input:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.admin-item:hover {
+  background: #f0f0f0;
+}
+
+.admin-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-icon {
+  color: #667eea;
+  font-size: 1.2rem;
+}
+
+.admin-info span {
+  color: #333;
+  font-size: 1rem;
+}
+
+.no-data {
+  color: #999;
+  text-align: center;
+  padding: 20px;
+}
