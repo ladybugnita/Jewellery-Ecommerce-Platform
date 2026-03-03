@@ -9,8 +9,11 @@ public class CustomerLoanRequest {
     @NotBlank(message = "Customer ID is required")
     private String customerId;
 
-    @NotNull(message = "principal amount is required")
-    @Positive(message = "Principal amount  must be positive")
+    private String customerSerialNumber;
+    private Boolean autoGenerateSerialNumber = true;
+
+    @NotNull(message = "Principal amount is required")
+    @Positive(message = "Principal amount must be positive")
     private Double principalAmount;
 
     @NotNull(message = "Interest rate is required")
@@ -25,4 +28,11 @@ public class CustomerLoanRequest {
 
     @NotEmpty(message = "At least one gold item must be pledged")
     private List<String> goldItemIds;
+
+    private String interestType = "SIMPLE";
+    private Integer compoundingFrequency;
+
+    private List<String> jewelleryPictures;
+    private List<String> billAttachments;
+    private Boolean isBulkLoan = false;
 }

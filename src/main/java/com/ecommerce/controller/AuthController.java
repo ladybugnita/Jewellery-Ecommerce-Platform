@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
+import com.ecommerce.repository.CustomerRepository;
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/auth")
@@ -44,13 +44,14 @@ public class AuthController {
     private final UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @PostMapping("/debug-complete")
     public ResponseEntity<Map<String, Object>> debugComplete(@RequestBody LoginRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // 1. Check if user exists in database
             Optional<User> userOpt = userRepository.findByEmail(request.getUsername());
 
             if (userOpt.isPresent()) {
@@ -60,11 +61,9 @@ public class AuthController {
                 response.put("userRole", user.getRole());
                 response.put("storedPasswordHash", user.getPassword());
 
-                // 2. Manual password check
                 boolean passwordMatches = passwordEncoder.matches(request.getPassword(), user.getPassword());
                 response.put("STEP2_PASSWORD_MATCH", passwordMatches);
 
-                // 3. Try to load UserDetails
                 try {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
                     response.put("STEP3_USERDETAILS_LOAD", "PASSED");
@@ -72,7 +71,6 @@ public class AuthController {
                     response.put("userDetailsPassword", userDetails.getPassword());
                     response.put("userDetailsAuthorities", userDetails.getAuthorities().toString());
 
-                    // 4. Try manual authentication
                     try {
                         UsernamePasswordAuthenticationToken token =
                                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
@@ -135,46 +133,43 @@ public class AuthController {
         }
     }
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request){
+    public ResponseEntity<ApiResponse<AuthResponse>> login(@RequestBody LoginRequest request) {
         try {
             System.out.println("========== LOGIN ATTEMPT ==========");
             System.out.println("Email: " + request.getUsername());
 
-            // Authenticate
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
             );
 
             System.out.println("Authentication successful!");
-            System.out.println("Authentication class: " + authentication.getClass().getName());
-            System.out.println("Principal class: " + authentication.getPrincipal().getClass().getName());
 
-            // Get UserDetails from authentication
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            System.out.println("UserDetails username: " + userDetails.getUsername());
-            System.out.println("UserDetails authorities: " + userDetails.getAuthorities());
-
-            // Generate token
             String jwt = jwtUtil.generateToken(userDetails);
-            System.out.println("JWT generated successfully");
-
-            // Extract role from authorities
             String role = userDetails.getAuthorities().iterator().next().getAuthority();
-            // Remove "ROLE_" prefix if present for response
+
             if (role.startsWith("ROLE_")) {
-                role = role.substring(5); // Remove "ROLE_"
+                role = role.substring(5);
             }
 
-            AuthResponse response = new AuthResponse(jwt, userDetails.getUsername(), role);
+            String userId = null;
+            Optional<User> userOpt = userRepository.findByEmail(request.getUsername());
+            if (userOpt.isPresent()) {
+                userId = userOpt.get().getId();
+            } else {
+                Optional<Customer> customerOpt = customerRepository.findByEmail(request.getUsername());
+                if (customerOpt.isPresent()) {
+                    userId = customerOpt.get().getId();
+                }
+            }
+
+            AuthResponse response = new AuthResponse(jwt, userDetails.getUsername(), role, userId);
             return ResponseEntity.ok(ApiResponse.success("Login successful", response));
 
         } catch (Exception e) {
             System.out.println("========== LOGIN FAILED ==========");
-            System.out.println("Error type: " + e.getClass().getName());
-            System.out.println("Error message: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
-
             return ResponseEntity.status(401)
                     .body(ApiResponse.error("Invalid username or password"));
         }

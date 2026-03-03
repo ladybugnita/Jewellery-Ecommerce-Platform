@@ -10,11 +10,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.ecommerce.service.GoldItemService;
+import com.ecommerce.dto.UserRoleResponse;
 
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
@@ -28,6 +32,7 @@ public class AdminController {
     private final UserService userService;
     private final CustomerRepository customerRepository;
     private final GoldItemRepository goldItemRepository;
+    private final GoldItemService goldItemService;
 
     @GetMapping("/dashboard")
     public ResponseEntity<ApiResponse<DashboardResponse>> getDashboard() {
@@ -168,22 +173,96 @@ public class AdminController {
                 .orElseThrow(() -> new RuntimeException("Gold item not found"));
         return ResponseEntity.ok(ApiResponse.success("Gold item updated successfully", updatedItem));
     }
-    @PostMapping("/users")
-    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody User user) {
-        user.setRole("ADMIN");
-        User savedUser = userService.createUser(user);
-        return new ResponseEntity<>(
-                ApiResponse.success("User created successfully", savedUser), HttpStatus.CREATED);
+    @GetMapping("/customer-loans/search")
+    public ResponseEntity<ApiResponse<List<CustomerLoan>>> searchCustomerLoans(
+            @RequestParam(required = false) String serialNumber,
+            @RequestParam(required = false) String searchTerm) {
+
+        List<CustomerLoan> loans;
+        if (serialNumber != null && !serialNumber.isEmpty()) {
+            loans = customerLoanService.searchLoansBySerialNumber(serialNumber);
+        } else if (searchTerm != null && !searchTerm.isEmpty()) {
+            loans = customerLoanService.searchLoans(searchTerm);
+        } else {
+            loans = customerLoanService.getAllActiveLoans();
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(loans));
     }
-    @GetMapping("/users")
-    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(ApiResponse.success(users));
+
+    @GetMapping("/customer-loans/serial/{serialNumber}")
+    public ResponseEntity<ApiResponse<CustomerLoan>> getCustomerLoanBySerialNumber(
+            @PathVariable String serialNumber) {
+        CustomerLoan loan = customerLoanService.getLoanByCustomerSerialNumber(serialNumber);
+        return ResponseEntity.ok(ApiResponse.success(loan));
     }
-    @GetMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable String id){
-        User user = userService.getUserById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(ApiResponse.success(user));
+
+    @GetMapping("/bank-loans/search")
+    public ResponseEntity<ApiResponse<List<BankLoan>>> searchBankLoans(
+            @RequestParam(required = false) String serialNumber,
+            @RequestParam(required = false) String searchTerm) {
+
+        List<BankLoan> loans;
+        if (serialNumber != null && !serialNumber.isEmpty()) {
+            loans = bankLoanService.searchBankLoansBySerialNumber(serialNumber);
+        } else if (searchTerm != null && !searchTerm.isEmpty()) {
+            loans = bankLoanService.searchBankLoans(searchTerm);
+        } else {
+            loans = bankLoanService.getAllActiveBankLoans();
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(loans));
+    }
+
+    @GetMapping("/bank-loans/serial/{serialNumber}")
+    public ResponseEntity<ApiResponse<BankLoan>> getBankLoanBySerialNumber(
+            @PathVariable String serialNumber) {
+        BankLoan loan = bankLoanService.getBankLoanBySerialNumber(serialNumber);
+        return ResponseEntity.ok(ApiResponse.success(loan));
+    }
+
+    @GetMapping("/gold-items/{id}/details")
+    public ResponseEntity<ApiResponse<GoldItemDetailResponse>> getGoldItemDetails(
+            @PathVariable String id) {
+        GoldItemDetailResponse details = goldItemService.getGoldItemDetails(id);
+        return ResponseEntity.ok(ApiResponse.success(details));
+    }
+
+    @GetMapping("/gold-items/customer/{customerId}/available")
+    public ResponseEntity<ApiResponse<List<GoldItem>>> getAvailableGoldItemsByCustomer(
+            @PathVariable String customerId) {
+        List<GoldItem> items = goldItemService.getAvailableGoldItemsByCustomer(customerId);
+        return ResponseEntity.ok(ApiResponse.success(items));
+    }
+
+    @GetMapping("/gold-items/customer/{customerId}/pledged")
+    public ResponseEntity<ApiResponse<List<GoldItem>>> getPledgedGoldItemsByCustomer(
+            @PathVariable String customerId) {
+        List<GoldItem> items = goldItemService.getPledgedItemsByCustomer(customerId);
+        return ResponseEntity.ok(ApiResponse.success(items));
+    }
+
+    @GetMapping("/bank-loans/customer-loan/{customerLoanId}")
+    public ResponseEntity<ApiResponse<List<BankLoan>>> getBankLoansByCustomerLoan(
+            @PathVariable String customerLoanId) {
+        List<BankLoan> loans = bankLoanService.getBankLoansByCustomerLoanId(customerLoanId);
+        return ResponseEntity.ok(ApiResponse.success(loans));
+    }
+
+    @PostMapping("/customer-loans/bulk")
+    public ResponseEntity<ApiResponse<List<CustomerLoan>>> createBulkCustomerLoans(
+            @Valid @RequestBody List<CustomerLoanRequest> requests) {
+        List<CustomerLoan> loans = new ArrayList<>();
+        for (CustomerLoanRequest request : requests) {
+            request.setIsBulkLoan(true);
+            loans.add(customerLoanService.createLoan(request));
+        }
+        return new ResponseEntity<>(ApiResponse.success("Bulk loans created successfully", loans),
+                HttpStatus.CREATED);
+    }
+    @GetMapping("/gold-items/available-for-bank")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getAvailableGoldItemsForBank() {
+        List<Map<String, Object>> items = goldItemService.getAvailableGoldItemsForBank();
+        return ResponseEntity.ok(ApiResponse.success(items));
     }
 }

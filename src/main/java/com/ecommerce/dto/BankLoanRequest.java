@@ -24,4 +24,9 @@ public class BankLoanRequest {
     private Integer tenureMonths;
 
     private List<String> goldItemIds;
+
+    @NotBlank(message = "Bank serial number is required")
+    private String bankSerialNumber;
+
+    private List<String> bankGoldImages;
 }
