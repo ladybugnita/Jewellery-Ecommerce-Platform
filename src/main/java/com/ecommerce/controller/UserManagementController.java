@@ -34,6 +34,7 @@ public class UserManagementController {
     public ResponseEntity<ApiResponse<UserRoleResponse>> updateUser(
             @PathVariable String id,
             @Valid @RequestBody UserRoleRequest request) {
+        System.out.println("updateUser called with id: " + id);
         UserRoleResponse response = userService.updateUserRole(id, request);
         return ResponseEntity.ok(ApiResponse.success("User updated successfully", response));
     }
@@ -79,4 +80,5 @@ public class UserManagementController {
         boolean canApprove = userService.canApproveLoan(id, amount, tenureMonths);
         return ResponseEntity.ok(ApiResponse.success(canApprove));
     }
+
 }

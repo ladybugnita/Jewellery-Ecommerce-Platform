@@ -1,6 +1,7 @@
 package com.ecommerce.service;
 
 import com.ecommerce.dto.GoldItemDetailResponse;
+import com.ecommerce.dto.GoldItemAdminResponse;
 import com.ecommerce.model.GoldItem;
 import com.ecommerce.repository.BankLoanRepository;
 import com.ecommerce.repository.CustomerLoanRepository;
@@ -86,6 +87,7 @@ public class GoldItemService {
         return goldItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Gold item not found with id: " + itemId));
     }
+
     public List<Map<String, Object>> getAvailableGoldItemsForBank() {
         List<GoldItem> pledgedItems = goldItemRepository.findByStatus("PLEDGED");
 
@@ -114,6 +116,64 @@ public class GoldItemService {
                     }
 
                     return itemMap;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<GoldItemDetailResponse> getGoldItemsWithLoanDetails(String customerId) {
+        List<GoldItem> items = goldItemRepository.findByCustomerId(customerId);
+        return items.stream()
+                .map(item -> {
+                    GoldItemDetailResponse.GoldItemDetailResponseBuilder builder = GoldItemDetailResponse.builder()
+                            .id(item.getId())
+                            .itemType(item.getItemType())
+                            .weightInGrams(item.getWeightInGrams())
+                            .purity(item.getPurity())
+                            .description(item.getDescription())
+                            .estimatedValue(item.getEstimatedValue())
+                            .status(item.getStatus())
+                            .imageUrl(item.getImageUrl())
+                            .serialNumber(item.getSerialNumber())
+                            .customerId(item.getCustomerId());
+
+                    if (item.getCustomerLoanId() != null) {
+                        customerLoanRepository.findById(item.getCustomerLoanId())
+                                .ifPresent(loan -> {
+                                    builder.customerSerialNumber(loan.getCustomerSerialNumber());
+                                    builder.loanNumber(loan.getLoanNumber());
+                                });
+                    }
+                    return builder.build();
+                })
+                .collect(Collectors.toList());
+    }
+    public List<GoldItemAdminResponse> getAllGoldItemsWithLoanDetails() {
+        List<GoldItem> items = goldItemRepository.findAll();
+        return items.stream()
+                .map(item -> {
+                    GoldItemAdminResponse.GoldItemAdminResponseBuilder builder = GoldItemAdminResponse.builder()
+                            .id(item.getId())
+                            .itemType(item.getItemType())
+                            .weightInGrams(item.getWeightInGrams())
+                            .purity(item.getPurity())
+                            .description(item.getDescription())
+                            .estimatedValue(item.getEstimatedValue())
+                            .status(item.getStatus())
+                            .imageUrl(item.getImageUrl())
+                            .serialNumber(item.getSerialNumber())
+                            .customerId(item.getCustomerId());
+
+                    customerRepository.findById(item.getCustomerId())
+                            .ifPresent(customer -> builder.customerName(customer.getFullName()));
+
+                    if (item.getCustomerLoanId() != null) {
+                        customerLoanRepository.findById(item.getCustomerLoanId())
+                                .ifPresent(loan -> {
+                                    builder.loanNumber(loan.getLoanNumber());
+                                    builder.customerSerialNumber(loan.getCustomerSerialNumber());
+                                });
+                    }
+                    return builder.build();
                 })
                 .collect(Collectors.toList());
     }

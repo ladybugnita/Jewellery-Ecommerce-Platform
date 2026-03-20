@@ -191,10 +191,6 @@ public class BankLoanService {
                 .orElseThrow(() -> new RuntimeException("Bank loan not found"));
     }
 
-    public BankLoan getBankLoanBySerialNumber(String serialNumber) {
-        return bankLoanRepository.findByBankSerialNumber(serialNumber)
-                .orElseThrow(() -> new RuntimeException("Bank loan not found with serial number: " + serialNumber));
-    }
 
     public List<BankLoan> searchBankLoansBySerialNumber(String serialNumber) {
         return bankLoanRepository.searchByBankSerialNumber(serialNumber);
@@ -282,5 +278,17 @@ public class BankLoanService {
         return activeLoans.stream()
                 .mapToDouble(BankLoan::getOutstandingAmount)
                 .sum();
+    }
+
+    public List<BankLoan> searchLoans(String searchTerm) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return List.of();
+        }
+        return bankLoanRepository.searchLoans(searchTerm);
+    }
+
+    public BankLoan getBankLoanBySerialNumber(String serialNumber) {
+        return bankLoanRepository.findByBankSerialNumber(serialNumber)
+                .orElseThrow(() -> new RuntimeException("Bank loan not found with serial: " + serialNumber));
     }
 }

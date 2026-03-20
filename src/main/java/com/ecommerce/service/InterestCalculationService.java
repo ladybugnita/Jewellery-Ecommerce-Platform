@@ -11,13 +11,13 @@ import java.util.List;
 
 @Service
 public class InterestCalculationService {
-    public double calculateCompoundInterest(double principal, double annualRate, int compoundingFrequency, int tenureMonths) {
+
+    public double calculateCompoundInterest(double principal, double annualRate, int tenureMonths) {
         double rate = annualRate / 100;
         double time = tenureMonths / 12.0;
+        int frequency = 12;
 
-        double amount = principal * Math.pow(1 + (rate / compoundingFrequency),
-                compoundingFrequency * time);
-
+        double amount = principal * Math.pow(1 + (rate / frequency), frequency * time);
         return amount - principal;
     }
 
@@ -35,7 +35,7 @@ public class InterestCalculationService {
 
         if ("COMPOUND".equals(loan.getInterestType())) {
             double annualRate = loan.getInterestRate();
-            int frequency = loan.getCompoundingFrequency() != null ? loan.getCompoundingFrequency() : 12;
+            int frequency = 12;
             double timeInYears = daysElapsed / 365.0;
 
             double amount = loan.getPrincipalAmount() *
@@ -67,7 +67,7 @@ public class InterestCalculationService {
 
             if ("COMPOUND".equals(loan.getInterestType())) {
                 double annualRate = loan.getInterestRate() / 100;
-                int frequency = loan.getCompoundingFrequency() != null ? loan.getCompoundingFrequency() : 12;
+                int frequency = 12;
                 double timeInYears = daysInPeriod / 365.0;
 
                 double interest = balance * (Math.pow(1 + annualRate / frequency, frequency * timeInYears) - 1);

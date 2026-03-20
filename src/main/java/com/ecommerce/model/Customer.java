@@ -17,4 +17,5 @@ public class Customer extends User {
     private Double annualIncome;
     private String signature;
     private LocalDateTime signatureUpdatedAt;
+    private String profileImage;
 }

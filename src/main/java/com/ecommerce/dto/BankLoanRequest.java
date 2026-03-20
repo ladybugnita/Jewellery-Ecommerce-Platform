@@ -15,7 +15,6 @@ public class BankLoanRequest {
 
     @NotNull(message = "Interest rate is required")
     @DecimalMin(value = "0.1", message = "Interest rate must be at least 0.1%")
-    @DecimalMax(value = "3.0", message = "Interest rate cannot exceed 3%")
     private Double interestRate;
 
     @NotNull(message = "Tenure months is required")

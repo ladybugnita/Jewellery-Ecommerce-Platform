@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class GoldItemDetailResponse {
+public class GoldItemAdminResponse {
     private String id;
     private String itemType;
     private Double weightInGrams;
@@ -20,8 +20,6 @@ public class GoldItemDetailResponse {
     private String customerId;
     private String customerName;
     private String customerLoanId;
-    private String customerSerialNumber;
-    private String bankLoanId;
-    private String bankSerialNumber;
     private String loanNumber;
+    private String customerSerialNumber;
 }

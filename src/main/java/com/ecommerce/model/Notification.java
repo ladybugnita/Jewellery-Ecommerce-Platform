@@ -11,14 +11,12 @@ import java.util.Map;
 public class Notification {
     @Id
     private String id;
-    private String type;
+    private String userId;
     private String title;
     private String message;
-    private String userId;
-    private String role;
+    private String type;
     private String referenceId;
+    private boolean isRead = false;
+    private LocalDateTime createdAt = LocalDateTime.now();
     private Map<String, Object> data;
-    private Boolean isRead = false;
-    private LocalDateTime createdAt;
-    private LocalDateTime readAt;
 }

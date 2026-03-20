@@ -6,6 +6,7 @@ import com.ecommerce.dto.UserRoleResponse;
 import com.ecommerce.model.Customer;
 import com.ecommerce.model.User;
 import com.ecommerce.repository.CustomerRepository;
+import com.ecommerce.dto.UserProfileUpdateRequest;
 import com.ecommerce.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     public UserRoleResponse createUserWithRole(UserRoleRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
@@ -30,6 +32,9 @@ public class UserService {
         }
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new RuntimeException("Password is required for new user");
         }
 
         User user = new User();
@@ -96,6 +101,7 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
+        user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setRole(request.getRole());
@@ -264,9 +270,11 @@ public class UserService {
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
     public Customer findCustomerByEmail(String email) {
         return customerRepository.findByEmail(email).orElse(null);
     }
+
     public long getTotalCustomers() {
         return userRepository.countByRole("CUSTOMER");
     }
@@ -290,6 +298,15 @@ public class UserService {
             user.setUpdatedAt(LocalDateTime.now());
             userRepository.save(user);
             System.out.println("Password changed successfully for user");
+
+            notificationService.createNotification(
+                    user.getId(),
+                    "Password Changed",
+                    "Your password was successfully changed.",
+                    "PASSWORD_CHANGED",
+                    null
+            );
+
             return true;
 
         } else if (customerOpt.isPresent()) {
@@ -306,6 +323,15 @@ public class UserService {
             customer.setUpdatedAt(LocalDateTime.now());
             customerRepository.save(customer);
             System.out.println("Password changed successfully for customer");
+
+            notificationService.createNotification(
+                    customer.getId(),
+                    "Password Changed",
+                    "Your password was successfully changed.",
+                    "PASSWORD_CHANGED",
+                    null
+            );
+
             return true;
         }
 
@@ -338,5 +364,21 @@ public class UserService {
                 .active(user.getActive())
                 .createdAt(user.getCreatedAt())
                 .build();
+    }
+    public Customer updateCustomerProfile(String customerId, UserProfileUpdateRequest request) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        customer.setFullName(request.getFullName());
+        customer.setPhoneNumber(request.getPhoneNumber());
+        customer.setAddress(request.getAddress());
+        customer.setOccupation(request.getOccupation());
+        customer.setAnnualIncome(request.getAnnualIncome());
+        customer.setIdProof(request.getIdProof());
+        customer.setIdProofNumber(request.getIdProofNumber());
+        customer.setProfileImage(request.getProfileImage());
+        customer.setUpdatedAt(LocalDateTime.now());
+
+        return customerRepository.save(customer);
     }
 }

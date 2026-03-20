@@ -18,7 +18,6 @@ public class CustomerLoanRequest {
 
     @NotNull(message = "Interest rate is required")
     @DecimalMin(value = "0.1", message = "Interest rate must be at least 0.1%")
-    @DecimalMax(value = "5.0", message = "Interest rate cannot exceed 5%")
     private Double interestRate;
 
     @NotNull(message = "Tenure months is required")
@@ -28,9 +27,6 @@ public class CustomerLoanRequest {
 
     @NotEmpty(message = "At least one gold item must be pledged")
     private List<String> goldItemIds;
-
-    private String interestType = "SIMPLE";
-    private Integer compoundingFrequency;
 
     private List<String> jewelleryPictures;
     private List<String> billAttachments;

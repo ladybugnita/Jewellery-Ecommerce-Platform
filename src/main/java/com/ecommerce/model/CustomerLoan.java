@@ -19,7 +19,6 @@ public class CustomerLoan {
     private Double principalAmount;
     private Double interestRate;
     private String interestType;
-    private Integer compoundingFrequency;
     private Double monthlyInterestRate;
     private Integer tenureMonths;
     private LocalDateTime startDate;
