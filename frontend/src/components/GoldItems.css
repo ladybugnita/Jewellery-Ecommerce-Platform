@@ -138,8 +138,26 @@ textarea {
   resize: vertical;
 }
 
+
 textarea:focus {
   border-color: #667eea;
   outline: none;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
+
+.loan-association-info {
+  margin: -10px 0 20px 0;
+  padding: 12px 15px;
+  background: #f8faff;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.loan-association-info strong {
+  color: #4b5563;
+  font-weight: 600;
+}

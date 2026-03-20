@@ -6,8 +6,18 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, 
   PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line 
 } from 'recharts';
+import { useTranslation } from 'react-i18next';
+import { useNepaliNumber } from '../hooks/useNepaliNumber';
+import { formatDate } from '../utils/nepaliFormat';
+
+const ConversionTest = () => {
+  const { i18n } = useTranslation();
+  const { convertNumber, convertCurrency, convertNumberWithCommas } = useNepaliNumber();
+};
 
 const Dashboard = ({ token }) => {
+  const { t, i18n } = useTranslation();
+  const { convertCurrency, convertNumberWithCommas, convertWeight, convertPercentage, convertNumber } = useNepaliNumber();
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,6 +27,19 @@ const Dashboard = ({ token }) => {
     closed: 0,
     defaulted: 0
   });
+
+  const [renderKey, setRenderKey] = useState(0);
+  useEffect(() => {
+    const handleLanguageChange = () => {
+      console.log('Language changed, forcing re-render');
+      setRenderKey(prev => prev + 1);
+    };
+    
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, [i18n]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -63,15 +86,6 @@ const Dashboard = ({ token }) => {
     }
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-NP', {
-      style: 'currency',
-      currency: 'NPR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(value || 0);
-  };
-
   if (loading) {
     return (
       <div className="loading-spinner">
@@ -84,21 +98,18 @@ const Dashboard = ({ token }) => {
     return <div className="error-message">{error}</div>;
   }
 
-  // Ensure loanStatusData is always an array
   const loanStatusData = [
-    { name: 'Active Loans', value: Number(loanStats.active) || 0 },
-    { name: 'Closed Loans', value: Number(loanStats.closed) || 0 },
-    { name: 'Defaulted', value: Number(loanStats.defaulted) || 0 }
+    { name: t('status.ACTIVE'), value: Number(loanStats.active) || 0 },
+    { name: t('status.CLOSED'), value: Number(loanStats.closed) || 0 },
+    { name: t('status.DEFAULTED', 'Defaulted'), value: Number(loanStats.defaulted) || 0 }
   ].filter(item => item.value > 0);
 
-  // If all values are zero, show at least one data point
   if (loanStatusData.length === 0) {
     loanStatusData.push({ name: 'No Loans', value: 1 });
   }
 
   const COLORS = ['#667eea', '#00b894', '#ff6b6b', '#fdcb6e'];
 
-  // Ensure monthlyData is always an array
   const monthlyData = Array.isArray(metrics?.monthlyLoanTrend) 
     ? metrics.monthlyLoanTrend 
     : [
@@ -111,11 +122,13 @@ const Dashboard = ({ token }) => {
       ];
 
   return (
-    <div className="dashboard fade-in">
+    <div className="dashboard fade-in" key={renderKey}>
+      <ConversionTest />
+      
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard Overview</h1>
+        <h1 className="dashboard-title">{t('nav.dashboard')} {t('dashboard.overview', 'Overview')}</h1>
         <button className="snapshot-button" onClick={handleSaveSnapshot}>
-          Save Snapshot
+          {t('dashboard.save_snapshot', 'Save Snapshot')}
         </button>
       </div>
 
@@ -125,9 +138,9 @@ const Dashboard = ({ token }) => {
             <FaMoneyBillWave />
           </div>
           <div className="metric-info">
-            <h3>Total Investment</h3>
-            <p className="metric-value">{formatCurrency(metrics?.totalInvestment)}</p>
-            <span className="metric-change positive">+12.5%</span>
+            <h3>{t('dashboard.total_investment', 'Total Investment')}</h3>
+            <p className="metric-value">{convertCurrency(metrics?.totalInvestment)}</p>
+            <span className="metric-change positive">+{convertNumberWithCommas(12.5)}%</span>
           </div>
         </div>
 
@@ -136,9 +149,9 @@ const Dashboard = ({ token }) => {
             <FaPercentage />
           </div>
           <div className="metric-info">
-            <h3>Receivable Interest</h3>
-            <p className="metric-value">{formatCurrency(metrics?.totalReceivableInterest)}</p>
-            <span className="metric-change positive">+8.2%</span>
+            <h3>{t('dashboard.receivable_interest', 'Receivable Interest')}</h3>
+            <p className="metric-value">{convertCurrency(metrics?.totalReceivableInterest)}</p>
+            <span className="metric-change positive">+{convertNumberWithCommas(8.2)}%</span>
           </div>
         </div>
 
@@ -147,9 +160,9 @@ const Dashboard = ({ token }) => {
             <FaCoins />
           </div>
           <div className="metric-info">
-            <h3>Payable Interest</h3>
-            <p className="metric-value">{formatCurrency(metrics?.totalPayableInterest)}</p>
-            <span className="metric-change negative">-2.1%</span>
+            <h3>{t('dashboard.payable_interest', 'Payable Interest')}</h3>
+            <p className="metric-value">{convertCurrency(metrics?.totalPayableInterest)}</p>
+            <span className="metric-change negative">-{convertNumberWithCommas(2.1)}%</span>
           </div>
         </div>
 
@@ -158,16 +171,16 @@ const Dashboard = ({ token }) => {
             <FaUsers />
           </div>
           <div className="metric-info">
-            <h3>Total Customers</h3>
-            <p className="metric-value">{metrics?.totalCustomers || 0}</p>
-            <span className="metric-change positive">+{metrics?.totalCustomers || 0}</span>
+            <h3>{t('dashboard.total_customers')}</h3>
+            <p className="metric-value">{convertNumberWithCommas(metrics?.totalCustomers || 0)}</p>
+            <span className="metric-change positive">+{convertNumberWithCommas(metrics?.totalCustomers || 0)}</span>
           </div>
         </div>
       </div>
 
       <div className="charts-section">
         <div className="chart-card">
-          <h2>Loan Distribution</h2>
+          <h2>{t('dashboard.loan_distribution', 'Loan Distribution')}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -175,7 +188,7 @@ const Dashboard = ({ token }) => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${convertNumberWithCommas((percent * 100).toFixed(0))}%`}
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
@@ -185,19 +198,19 @@ const Dashboard = ({ token }) => {
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip />
+              <Tooltip formatter={(value) => convertNumberWithCommas(value)} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
         <div className="chart-card">
-          <h2>Monthly Loan Trend</h2>
+          <h2>{t('dashboard.loan_trend', 'Monthly Loan Trend')}</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip formatter={(value) => formatCurrency(value)} />
+              <Tooltip formatter={(value) => convertCurrency(value)} />
               <Legend />
               <Line type="monotone" dataKey="amount" stroke="#667eea" strokeWidth={2} />
             </LineChart>
@@ -208,35 +221,35 @@ const Dashboard = ({ token }) => {
       <div className="summary-section">
         <div className="summary-cards">
           <div className="summary-card">
-            <h3>Net Profit</h3>
-            <p className="profit-value">{formatCurrency(metrics?.netProfit)}</p>
-            <p className="profit-detail">Receivable: {formatCurrency(metrics?.totalReceivableInterest)}</p>
-            <p className="profit-detail">Payable: {formatCurrency(metrics?.totalPayableInterest)}</p>
+            <h3>{t('dashboard.net_profit', 'Net Profit')}</h3>
+            <p className="profit-value">{convertCurrency(metrics?.netProfit)}</p>
+            <p className="profit-detail">{t('dashboard.receivable_interest')}: {convertCurrency(metrics?.totalReceivableInterest)}</p>
+            <p className="profit-detail">{t('dashboard.payable_interest')}: {convertCurrency(metrics?.totalPayableInterest)}</p>
           </div>
 
           <div className="summary-card">
-            <h3>Bank Loans</h3>
-            <p className="profit-value">{formatCurrency(metrics?.totalBankLoans)}</p>
-            <p className="profit-detail">Active Loans: {metrics?.activeBankLoans || 0}</p>
-            <p className="profit-detail">Gold Pledged: {metrics?.totalGoldWeightPledged?.toFixed(2)}g</p>
+            <h3>{t('nav.loans')} (Bank)</h3>
+            <p className="profit-value">{convertCurrency(metrics?.totalBankLoans)}</p>
+            <p className="profit-detail">{t('dashboard.active_loans')}: {convertNumberWithCommas(metrics?.activeBankLoans || 0)}</p>
+            <p className="profit-detail">{t('dashboard.gold_pledged', 'Gold Pledged')}: {convertWeight(metrics?.totalGoldWeightPledged)}</p>
           </div>
         </div>
 
         <div className="recent-loans-card">
-          <h3>Recent Loans</h3>
+          <h3>{t('dashboard.recent_loans')}</h3>
           <div className="recent-loans-list">
             {recentLoans.length > 0 ? (
               recentLoans.map(loan => (
                 <div key={loan.id} className="recent-loan-item">
-                  <span className="loan-amount">{formatCurrency(loan.principalAmount)}</span>
+                  <span className="loan-amount">{convertCurrency(loan.principalAmount)}</span>
                   <span className="loan-status" data-status={loan.status?.toLowerCase()}>
-                    {loan.status}
+                    {t(`status.${loan.status}`, loan.status)}
                   </span>
-                  <span className="loan-date">{new Date(loan.createdAt).toLocaleDateString()}</span>
+                  <span className="loan-date">{formatDate(loan.createdAt, i18n.language)}</span>
                 </div>
               ))
             ) : (
-              <p className="no-data">No recent loans</p>
+              <p className="no-data">{t('dashboard.no_recent_loans')}</p>
             )}
           </div>
         </div>

@@ -1,0 +1,40 @@
+.language-switcher {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.language-switcher button {
+  background: transparent;
+  border: none;
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+
+.language-switcher button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.language-switcher button.active {
+  background: #dbae58;
+  color: #1a1a1a;
+  box-shadow: 0 2px 10px rgba(219, 174, 88, 0.4);
+}
+
+.language-switcher.dark-mode button {
+  color: #333;
+}

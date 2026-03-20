@@ -242,3 +242,132 @@ small {
     justify-content: center;
   }
 }
+.pending-card {
+  border-left: 4px solid #f39c12;
+}
+
+.loan-status.pending {
+  background: #f39c12;
+  color: white;
+}
+
+.nepali-small {
+  display: block;
+  color: #f39c12;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+.approval-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.approve-btn, .reject-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.approve-btn {
+  background: linear-gradient(135deg, #00b894, #00cec9);
+  color: white;
+}
+
+.approve-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+}
+
+.reject-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  color: white;
+}
+
+.reject-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+}
+
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+textarea:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.monthly-breakdown {
+  margin-top: 20px;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  background-color: white;
+}
+
+.breakdown-table th {
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 2px solid #eee;
+  white-space: nowrap;
+}
+
+.breakdown-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #eee;
+  color: #555;
+}
+
+.breakdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.breakdown-table tr:nth-child(even) {
+  background-color: #fafbfc;
+}
+
+.breakdown-table tr:hover {
+  background-color: #f1f4f9;
+}
+
+.breakdown-table strong {
+  color: #2d3436;
+}
+
+@media (max-width: 600px) {
+  .breakdown-table th, .breakdown-table td {
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+}

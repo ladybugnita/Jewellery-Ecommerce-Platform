@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './CustomerList.css';
 import { adminAPI } from '../services/api';
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaEye, FaCamera } from 'react-icons/fa'; 
+import { useNepaliNumber } from '../hooks/useNepaliNumber';
+import { formatDateTime, toNepaliDigits, toEnglishDigits } from '../utils/nepaliFormat';
+import WebcamCapture from './WebcamCapture'; 
 
 const CustomerList = ({ token }) => {
+  const { t, i18n } = useTranslation();
+  const currentLng = i18n.language;
+  const { convertCurrency } = useNepaliNumber();
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,6 +18,7 @@ const CustomerList = ({ token }) => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [editingCustomer, setEditingCustomer] = useState(null);
+  const [showWebcam, setShowWebcam] = useState(false);
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -21,7 +29,8 @@ const CustomerList = ({ token }) => {
     idProof: 'citizenship',
     idProofNumber: '',
     occupation: '',
-    annualIncome: ''
+    annualIncome: '',
+    profileImage: '' 
   });
 
   useEffect(() => {
@@ -40,10 +49,32 @@ const CustomerList = ({ token }) => {
   };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const englishValue = toEnglishDigits(value);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: englishValue
     });
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, profileImage: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleWebcamCapture = (imageBase64) => {
+    setFormData({ ...formData, profileImage: imageBase64 });
+  };
+
+  const displayValue = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    return currentLng === 'ne' ? toNepaliDigits(value.toString()) : value.toString();
   };
 
   const handleSubmit = async (e) => {
@@ -59,18 +90,18 @@ const CustomerList = ({ token }) => {
       resetForm();
     } catch (err) {
       console.error('Failed to save customer:', err);
-      alert('Failed to save customer: ' + (err.response?.data?.message || err.message));
+      alert(t('customers.save_failed') + ': ' + (err.response?.data?.message || err.message));
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    if (window.confirm(t('customers.confirm_delete'))) {
       try {
         await adminAPI.deleteCustomer(id);
         fetchCustomers();
       } catch (err) {
         console.error('Failed to delete customer:', err);
-        alert('Failed to delete customer');
+        alert(t('customers.delete_failed'));
       }
     }
   };
@@ -92,7 +123,8 @@ const CustomerList = ({ token }) => {
       idProof: customer.idProof || 'citizenship',
       idProofNumber: customer.idProofNumber || '',
       occupation: customer.occupation || '',
-      annualIncome: customer.annualIncome || ''
+      annualIncome: customer.annualIncome || '',
+      profileImage: customer.profileImage || '' 
     });
     setShowModal(true);
   };
@@ -109,7 +141,8 @@ const CustomerList = ({ token }) => {
       idProof: 'citizenship',
       idProofNumber: '',
       occupation: '',
-      annualIncome: ''
+      annualIncome: '',
+      profileImage: '' 
     });
   };
 
@@ -130,19 +163,19 @@ const CustomerList = ({ token }) => {
   return (
     <div className="customer-list fade-in">
       <div className="list-header">
-        <h1>Customers</h1>
+        <h1>{t('customers.title')}</h1>
         <div className="header-actions">
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Search customers..."
+              placeholder={t('customers.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button className="add-button" onClick={() => setShowModal(true)}>
-            <FaPlus /> Add Customer
+            <FaPlus /> {t('customers.add')}
           </button>
         </div>
       </div>
@@ -151,26 +184,30 @@ const CustomerList = ({ token }) => {
         {filteredCustomers.map(customer => (
           <div key={customer.id} className="customer-card">
             <div className="customer-avatar">
-              {customer.fullName?.charAt(0) || 'C'}
+              {customer.profileImage ? (
+                <img src={customer.profileImage} alt={customer.fullName} className="avatar-image" />
+              ) : (
+                customer.fullName?.charAt(0) || 'C'
+              )}
             </div>
             <div className="customer-info">
               <h3>{customer.fullName}</h3>
               <p className="customer-email">{customer.email}</p>
-              <p className="customer-phone">{customer.phoneNumber}</p>
+              <p className="customer-phone">{displayValue(customer.phoneNumber)}</p>
               <p className="customer-address">{customer.address}</p>
               <div className="customer-details">
                 <span className="badge">{customer.occupation || 'N/A'}</span>
-                <span className="badge">₹{customer.annualIncome?.toLocaleString() || 0}</span>
+                <span className="badge">{convertCurrency(customer.annualIncome)}</span>
               </div>
             </div>
             <div className="customer-actions">
-              <button className="view-btn" onClick={() => handleView(customer)}>
+              <button className="view-btn" onClick={() => handleView(customer)} title={t('customers.view')}>
                 <FaEye />
               </button>
-              <button className="edit-btn" onClick={() => handleEdit(customer)}>
+              <button className="edit-btn" onClick={() => handleEdit(customer)} title={t('customers.edit_action')}>
                 <FaEdit />
               </button>
-              <button className="delete-btn" onClick={() => handleDelete(customer.id)}>
+              <button className="delete-btn" onClick={() => handleDelete(customer.id)} title={t('customers.delete')}>
                 <FaTrash />
               </button>
             </div>
@@ -181,13 +218,33 @@ const CustomerList = ({ token }) => {
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <h2>{editingCustomer ? 'Edit Customer' : 'Add New Customer'}</h2>
+            <h2>{editingCustomer ? t('customers.edit') : t('customers.add_new')}</h2>
             <form onSubmit={handleSubmit}>
+              <div className="form-row">
+                <div className="image-upload-group" style={{ width: '100%', marginBottom: '10px' }}>
+                  <label>{t('customers.profile_image', 'Profile Image')}</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {formData.profileImage && (
+                      <img src={formData.profileImage} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" onClick={() => setShowWebcam(true)} className="camera-btn">
+                      <FaCamera /> {t('common.capture', 'Capture')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="form-row">
                 <input
                   type="text"
                   name="username"
-                  placeholder="Username"
+                  placeholder={t('customers.username')}
                   value={formData.username}
                   onChange={handleInputChange}
                   required
@@ -195,7 +252,7 @@ const CustomerList = ({ token }) => {
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder={t('customers.email')}
                   value={formData.email}
                   onChange={handleInputChange}
                   required
@@ -206,7 +263,7 @@ const CustomerList = ({ token }) => {
                   <input
                     type="password"
                     name="password"
-                    placeholder="Password"
+                    placeholder={t('customers.password')}
                     value={formData.password}
                     onChange={handleInputChange}
                     required={!editingCustomer}
@@ -217,7 +274,7 @@ const CustomerList = ({ token }) => {
                 <input
                   type="text"
                   name="fullName"
-                  placeholder="Full Name"
+                  placeholder={t('customers.full_name')}
                   value={formData.fullName}
                   onChange={handleInputChange}
                   required
@@ -225,8 +282,8 @@ const CustomerList = ({ token }) => {
                 <input
                   type="text"
                   name="phoneNumber"
-                  placeholder="Phone Number"
-                  value={formData.phoneNumber}
+                  placeholder={t('customers.phone')}
+                  value={displayValue(formData.phoneNumber)}
                   onChange={handleInputChange}
                   required
                 />
@@ -235,7 +292,7 @@ const CustomerList = ({ token }) => {
                 <input
                   type="text"
                   name="address"
-                  placeholder="Address"
+                  placeholder={t('customers.address')}
                   value={formData.address}
                   onChange={handleInputChange}
                   required
@@ -245,34 +302,34 @@ const CustomerList = ({ token }) => {
                   value={formData.idProof}
                   onChange={handleInputChange}
                 >
-                  <option value="citizenship">Citizenship</option>
-                  <option value="passport">Passport</option>
-                  <option value="driving_license">Driving License</option>
+                  <option value="citizenship">{t('customers.id_proof_types.citizenship')}</option>
+                  <option value="passport">{t('customers.id_proof_types.passport')}</option>
+                  <option value="driving_license">{t('customers.id_proof_types.driving_license')}</option>
                 </select>
               </div>
               <div className="form-row">
                 <input
                   type="text"
                   name="idProofNumber"
-                  placeholder="ID Proof Number"
-                  value={formData.idProofNumber}
+                  placeholder={t('customers.id_proof_number')}
+                  value={displayValue(formData.idProofNumber)}
                   onChange={handleInputChange}
                   required
                 />
                 <input
                   type="text"
                   name="occupation"
-                  placeholder="Occupation"
+                  placeholder={t('customers.occupation')}
                   value={formData.occupation}
                   onChange={handleInputChange}
                 />
               </div>
               <div className="form-row">
                 <input
-                  type="number"
+                  type="text"
                   name="annualIncome"
-                  placeholder="Annual Income"
-                  value={formData.annualIncome}
+                  placeholder={t('customers.annual_income')}
+                  value={displayValue(formData.annualIncome)}
                   onChange={handleInputChange}
                 />
               </div>
@@ -281,10 +338,10 @@ const CustomerList = ({ token }) => {
                   setShowModal(false);
                   resetForm();
                 }}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" className="submit-btn">
-                  {editingCustomer ? 'Update' : 'Create'}
+                  {editingCustomer ? t('customers.edit_action') : t('customers.add')}
                 </button>
               </div>
             </form>
@@ -295,26 +352,38 @@ const CustomerList = ({ token }) => {
       {showViewModal && selectedCustomer && (
         <div className="modal">
           <div className="modal-content">
-            <h2>Customer Details</h2>
+            <h2>{t('customers.details')}</h2>
+            {selectedCustomer.profileImage && (
+              <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                <img src={selectedCustomer.profileImage} alt={selectedCustomer.fullName} style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} />
+              </div>
+            )}
             <div className="customer-details-view">
-              <p><strong>Full Name:</strong> {selectedCustomer.fullName}</p>
-              <p><strong>Username:</strong> {selectedCustomer.username}</p>
-              <p><strong>Email:</strong> {selectedCustomer.email}</p>
-              <p><strong>Phone:</strong> {selectedCustomer.phoneNumber}</p>
-              <p><strong>Address:</strong> {selectedCustomer.address}</p>
-              <p><strong>ID Proof:</strong> {selectedCustomer.idProof} - {selectedCustomer.idProofNumber}</p>
-              <p><strong>Occupation:</strong> {selectedCustomer.occupation || 'N/A'}</p>
-              <p><strong>Annual Income:</strong> ₹{selectedCustomer.annualIncome?.toLocaleString() || 0}</p>
-              <p><strong>Status:</strong> {selectedCustomer.active ? 'Active' : 'Inactive'}</p>
-              <p><strong>Created:</strong> {new Date(selectedCustomer.createdAt).toLocaleString()}</p>
+              <p><strong>{t('customers.full_name')}:</strong> {selectedCustomer.fullName}</p>
+              <p><strong>{t('customers.username')}:</strong> {selectedCustomer.username}</p>
+              <p><strong>{t('customers.email')}:</strong> {selectedCustomer.email}</p>
+              <p><strong>{t('customers.phone')}:</strong> {displayValue(selectedCustomer.phoneNumber)}</p>
+              <p><strong>{t('customers.address')}:</strong> {selectedCustomer.address}</p>
+              <p><strong>{t('customers.id_proof')}:</strong> {t(`customers.id_proof_types.${selectedCustomer.idProof}`)} - {displayValue(selectedCustomer.idProofNumber)}</p>
+              <p><strong>{t('customers.occupation')}:</strong> {selectedCustomer.occupation || 'N/A'}</p>
+              <p><strong>{t('customers.annual_income')}:</strong> {convertCurrency(selectedCustomer.annualIncome)}</p>
+              <p><strong>{t('customers.status')}:</strong> {selectedCustomer.active ? t('customers.active') : t('customers.inactive')}</p>
+              <p><strong>{t('customers.created')}:</strong> {formatDateTime(selectedCustomer.createdAt, currentLng)}</p>
             </div>
             <div className="modal-actions">
               <button type="button" className="cancel-btn" onClick={() => setShowViewModal(false)}>
-                Close
+                {t('common.close')}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {showWebcam && (
+        <WebcamCapture
+          onCapture={handleWebcamCapture}
+          onClose={() => setShowWebcam(false)}
+        />
       )}
     </div>
   );

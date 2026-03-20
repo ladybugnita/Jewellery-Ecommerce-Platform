@@ -1,27 +1,28 @@
-*.properties
-.env
-.idea/
-.vscode/
-.DS_Store
-node_modules/
-=======
 # Compiled files
-target/
+**/target/
 *.class
+
+# Node modules
+**/node_modules/
+node_modules/
+
+# Frontend build output
+frontend/build/
 
 # IDE files
 .idea/
+.vscode/
 *.iml
 .classpath
 .project
 .settings/
-.vscode/
 
 # Logs
 logs/
 *.log
 
-# Application Properties - KEEP THESE OUT!
+# Application Properties 
+*.properties
 application.properties
 application-local.properties
 application-dev.properties
