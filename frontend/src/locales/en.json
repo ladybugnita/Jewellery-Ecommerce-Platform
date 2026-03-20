@@ -1,0 +1,489 @@
+{
+  "translation": {
+    "app_title": "Jewellery Ecommerce Platform",
+    "hero": {
+      "title": "Exquisite Jewellery for Every Occasion",
+      "subtitle": "Discover our collection of premium gold and diamond jewellery, crafted with passion and precision.",
+      "get_started": "Get Started",
+      "learn_more": "Learn More",
+      "unique_designs": "Unique Designs",
+      "happy_customers": "Happy Customers",
+      "pure_gold": "Pure Gold",
+      "certified_artisans": "Certified Artisans"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "profile": "My Profile",
+      "loans": "My Loans",
+      "gold_items": "My Gold Items",
+      "request_loan": "Request Loan",
+      "management": "Management",
+      "logout": "Logout",
+      "login": "Login",
+      "signup": "Sign Up",
+      "home": "Home",
+      "customers": "Customers"   
+
+    },
+    "loans": {
+      "title": "Loans",
+      "request_new": "Request New Loan",
+      "my_loans": "My Loans",
+      "pending": "Pending Approval",
+      "active": "Active",
+      "closed": "Closed",
+      "rejected": "Rejected",
+      "principal": "Principal Amount",
+      "tenure": "Tenure (Months)",
+      "interest": "Interest Rate (%)",
+      "status": "Status",
+      "actions": "Actions",
+      "view_details": "View Details",
+      "customer": "Customer",
+      "date": "Date",
+      "outstanding": "Outstanding",
+      "search_placeholder": "Search by loan number or customer...",
+      "no_data": "No loans found",
+      "approve": "Approve",
+      "reject": "Reject",
+      "new_loan_btn": "New Loan",
+      "serial": "Serial",
+      "maturity_date": "Maturity Date",
+      "paid": "Paid",
+      "requested": "Requested",
+      "request_date": "Request Date",
+      "bank": "Bank",
+      "interest_rate": "Interest Rate",
+      "start_date": "Start Date",
+      "total_interest": "Total Interest",
+      "total_payable": "Total Payable",
+      "pledged_items": "Pledged Items",
+      "create_new": "Create New Loan",
+      "select_customer": "Select Customer",
+      "interest_type": "Interest Type",
+      "exclusive": "Interest (Exclusive)",
+      "monthly_breakdown": "Monthly Payment Breakdown",
+      "principal_recovered": "Principal Recovered",
+      "interest_earned": "Interest Earned",
+      "total_collection": "Total Collection",
+      "remaining_principal": "Remaining Principal",
+      "process_repayment": "Process Repayment",
+      "enter_serial_placeholder": "Enter serial number...",
+      "customer_serial": "Customer Serial",
+      "principal_amount": "Principal Amount",
+      "total_interest_receivable": "Total Interest Receivable",
+      "interest_paid": "Interest Paid",
+      "amount_paid": "Amount Paid",
+      "outstanding_amount": "Outstanding Amount",
+      "bank_serial": "Bank Serial",
+      "total_interest_payable": "Total Interest Payable",
+      "pledged_gold_items": "Pledged Gold Items",
+      "serial_number": "Serial Number",
+      "bank_name": "Bank Name",
+      "current_status": "Current Status"
+
+    },
+    "common": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "loading": "Loading...",
+      "error": "Error",
+      "success": "Success",
+      "search": "Search",
+      "npr": "NPR",
+      "months": "months",
+      "items": "items",
+      "compound": "Compound",
+      "simple": "Simple",
+      "just_now": "Just now",
+      "minutes_ago": "{{count}} min ago",
+      "minutes_ago_plural": "{{count}} mins ago",
+      "hours_ago": "{{count}} hour ago",
+      "hours_ago_plural": "{{count}} hours ago",
+      "days_ago": "{{count}} day ago",
+      "days_ago_plural": "{{count}} days ago",
+      "details": "Details",
+      "monthly": "Monthly",
+      "pay": "Pay",
+      "month": "Month",
+      "close": "Close",
+      "confirm": "Confirm",
+      "yes": "Yes",
+      "no": "No",
+      "capture": "Capture",
+      "create": "Create",
+      "update": "Update",
+      "choose_file": "Choose file",
+      "file_selected": "File selected"
+    },
+    "auth": {
+      "login_title": "Welcome Back",
+      "login_subtitle": "Login to your dashboard",
+      "signup_title": "Create an Account",
+      "signup_subtitle": "Join our jewellery community",
+      "email": "Email Address",
+      "password": "Password",
+      "confirm_password": "Confirm Password",
+      "forgot_password": "Forgot Password?",
+      "no_account": "Don't have an account?",
+      "have_account": "Already have an account?",
+      "login_btn": "Login",
+      "signup_btn": "Sign Up",
+      "fullname": "Full Name",
+      "phone": "Phone Number",
+      "address": "Address",
+      "username": "Username",
+      "id_proof_number": "ID Proof Number",
+      "occupation": "Occupation",
+      "annual_income": "Annual Income",
+      "logging_in": "Logging in...",
+      "signing_up": "Signing up...",
+       "password_mismatch": "Passwords do not match",
+      "registration_success": "Registration successful! Redirecting to login...",
+      "registration_failed": "Registration failed. Please try again."
+    },
+    "status": {
+      "AVAILABLE": "Available",
+      "PLEDGED": "Pledged",
+      "PENDING_APPROVAL": "Pending Approval",
+      "ACTIVE": "Active",
+      "REJECTED": "Rejected",
+      "CLOSED": "Closed",
+      "APPROVED": "Approved",
+      "DISBURSED": "Disbursed",
+      "DEFAULTED": "Defaulted",
+      "PLEDGED_TO_BANK": "Pledged to Bank",
+      "PLEDGED_TO_CUSTOMER": "Pledged to Customer"
+    },
+    "roles": {
+      "ADMIN": "Administrator",
+      "USER": "Customer",
+      "STAFF": "Staff Member",
+      "CUSTOMER": "Customer"
+    },
+    "dashboard": {
+      "welcome": "Welcome",
+      "good_morning": "Good Morning",
+      "good_afternoon": "Good Afternoon",
+      "good_evening": "Good Evening",
+      "total_customers": "Total Customers",
+      "active_loans": "Active Loans",
+      "pending_approvals": "Pending Approvals",
+      "total_gold_items": "Total Gold Items",
+      "total_loan_amount": "Total Loan Amount",
+      "recent_loans": "Recent Loans",
+      "no_recent_loans": "No recent loans found",
+      "role_badge": "Role",
+      "features": "Available Features",
+      "loading_dashboard": "Setting up your dashboard...",
+      "overview": "Overview",
+      "save_snapshot": "Save Snapshot",
+      "total_investment": "Total Investment",
+      "receivable_interest": "Receivable Interest",
+      "payable_interest": "Payable Interest",
+      "loan_distribution": "Loan Distribution",
+      "loan_trend": "Monthly Loan Trend",
+      "net_profit": "Net Profit",
+      "gold_pledged": "Gold Pledged"
+    },
+    "item_types": {
+      "Necklace": "Necklace",
+      "Ring": "Ring",
+      "Earring": "Earring",
+      "Bracelet": "Bracelet",
+      "Chain": "Chain",
+      "Coin": "Coin",
+      "Other": "Other"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications",
+      "mark_all_read": "Mark all as read",
+      "types": {
+        "LOAN_REQUEST": "Loan Request",
+        "LOAN_REQUESTED": "Loan Request",
+        "LOAN_APPROVED": "Loan Approved",
+        "LOAN_REJECTED": "Loan Rejected"
+      },
+      "messages": {
+    "LOAN_REQUESTED": "Your loan request {{loanNumber}} has been submitted securely. Pending administrator review.",
+    "LOAN_APPROVED": "Your loan request {{loanNumber}} has been approved and is now ACTIVE.",
+    "LOAN_REJECTED": "Your loan request {{loanNumber}} was rejected. Reason: {{reason}}",
+    "LOAN_REQUEST": "Customer {{customerName}} has requested a new loan: {{loanNumber}}"
+  }
+    },
+    "admin": {
+      "management": "Admin Management",
+      "add_new": "Add New Admin",
+      "enter_email": "Enter admin email",
+      "add_admin": "Add Admin",
+      "admin_list": "Admin List",
+      "remove_admin": "Remove Admin",
+      "no_admins": "No admins found",
+      "added_success": "Admin added successfully",
+      "removed_success": "Admin removed successfully",
+      "add_failed": "Failed to add admin",
+      "remove_failed": "Failed to remove admin",
+      "confirm_remove": "Are you sure you want to remove {{email}} from admin list?",
+      "fetch_failed": "Failed to load users.",
+      "user_updated": "User updated successfully.",
+      "user_created": "User created successfully.",
+      "operation_failed": "Operation failed.",
+      "users_list": "Users List",
+      "add_new_user": "Add New User",
+      "edit_user": "Edit User",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "phone": "Phone Number",
+      "employee_id": "Employee ID",
+      "department": "Department",
+      "designation": "Designation",
+      "salary": "Salary",
+      "permissions": "Permissions",
+      "can_create_customers": "Can create customers",
+      "can_edit_customers": "Can edit customers",
+      "can_delete_customers": "Can delete customers",
+      "can_create_loans": "Can create loans",
+      "can_approve_loans": "Can approve loans",
+      "can_process_payments": "Can process payments",
+      "can_view_reports": "Can view reports",
+      "can_manage_users": "Can manage users",
+      "max_loan_approval_limit": "Max Loan Approval Limit (NPR)",
+      "max_loan_tenure_months": "Max Loan Tenure (months)",
+      "active": "Active",
+      "inactive": "Inactive",
+      "status_changed": "User status updated.",
+      "no_users": "No users found."
+    },
+
+  "staff": {
+    "dashboard": {
+      "title": "Staff Dashboard",
+      "total_customers": "Total Customers",
+      "active_loans": "Active Loans",
+      "pending_approvals": "Pending Approvals",
+      "no_data": "No data available"
+    },
+    "customers": "Customers",
+    "pending_approvals": "Pending Approvals"
+  }, 
+
+    "customers": {
+      "title": "Customers",
+      "search": "Search customers...",
+      "add": "Add Customer",
+      "add_new": "Add New Customer",
+      "edit": "Edit Customer",
+      "details": "Customer Details",
+      "username": "Username",
+      "full_name": "Full Name",
+      "email": "Email",
+      "phone": "Phone Number",
+      "address": "Address",
+      "password": "Password",
+      "id_proof": "ID Proof",
+      "id_proof_number": "ID Proof Number",
+      "occupation": "Occupation",
+      "annual_income": "Annual Income",
+      "status": "Status",
+      "active": "Active",
+      "inactive": "Inactive",
+      "created": "Created",
+      "actions": "Actions",
+      "view": "View",
+      "edit_action": "Edit",
+      "delete": "Delete",
+      "confirm_delete": "Are you sure you want to delete this customer?",
+      "delete_failed": "Failed to delete customer",
+      "save_failed": "Failed to save customer",
+      "no_customers": "No customers found",
+      "id_proof_types": {
+      "citizenship": "Citizenship",
+      "passport": "Passport",
+      "driving_license": "Driving License",
+      "profile_image": "Profile Image"
+      }
+    },
+    "gold_items": {
+      "title": "Gold Items Inventory",
+      "search": "Search items...",
+      "add": "Add Gold Item",
+      "add_new": "Add New Gold Item",
+      "edit": "Edit Gold Item",
+      "stats": {
+        "total_items": "Total Items",
+        "total_weight": "Total Weight",
+        "total_value": "Total Value"
+      },
+      "fields": {
+        "item_type": "Item Type",
+        "weight": "Weight (grams)",
+        "purity": "Purity",
+        "estimated_value": "Estimated Value",
+        "description": "Description",
+        "serial_number": "Serial Number",
+        "owner": "Owner",
+        "customer_loan_serial": "Customer Loan Serial Number",
+        "loan_number": "Loan Number",
+        "image": "Gold Image"
+      },
+      "status": {
+        "AVAILABLE": "Available",
+        "PLEDGED": "Pledged",
+        "PLEDGED_TO_BANK": "Pledged to Bank"
+      },
+      "confirm_delete": "Are you sure you want to delete this gold item?",
+      "no_items": "No gold items found"
+    },
+    "loan_request": {
+      "title": "Request a New Loan",
+      "loan_details": "Loan Details",
+      "principal_amount": "Principal Amount (NPR)",
+      "tenure": "Tenure (Months)",
+      "interest_info": "Interest will be calculated using <strong>Compound Interest</strong> and the rate will be determined by admin upon approval on a per-annum (% p.a.) basis.",
+      "gold_items_section": "Gold Items to Pledge",
+      "add_gold_item": "Add Gold Item",
+      "gold_item": "Gold Item #{{number}}",
+      "fields": {
+        "item_type": "Item Type",
+        "weight": "Weight (grams)",
+        "purity": "Purity",
+        "estimated_value": "Estimated Value (NPR)",
+        "serial_number": "Serial Number (Optional)",
+        "description": "Description (Optional)"
+      },
+      "upload": {
+        "title": "Upload Documents",
+        "gold_image": "Gold Image",
+        "signature": "Customer Signature",
+        "bills": "Bill Attachments (Multiple)"
+      },
+      "validation": {
+        "fill_all": "Please fill all required fields for gold item {{number}}",
+        "valid_tenure": "Please enter a valid tenure between 1 and 36 months"
+      },
+      "success": "Loan request submitted successfully! It is pending approval.",
+      "submit": "Submit Loan Request",
+      "submitting": "Submitting...",
+      "cancel": "Cancel"
+    },
+    "user": {
+      "dashboard": {
+        "greeting": {
+          "morning": "Good Morning",
+          "afternoon": "Good Afternoon",
+          "evening": "Good Evening"
+        },
+        "stats": {
+          "total_loans": "Total Loans",
+          "active_loans": "Active Loans",
+          "gold_items": "Gold Items"
+        },
+        "recent_loans": "Recent Loans",
+        "empty": {
+          "customer": "Welcome! Your dashboard is being set up.",
+          "staff": "Welcome to your dashboard! Start exploring.",
+          "default": "Welcome to your dashboard! Start exploring."
+        }
+      },
+      "gold_items": {
+        "title": "My Gold Items",
+        "empty": "You don't have any gold items registered yet.",
+        "view_details": "View Details",
+        "fields": {
+          "item_type": "Item Type",
+          "weight": "Weight",
+          "purity": "Purity",
+          "estimated_value": "Estimated Value",
+          "serial_number": "Serial Number",
+          "customer_loan_serial": "Customer Loan Serial Number",
+          "description": "Description",
+          "status": "Status",
+          "loan_number": "Loan Number"
+
+        }
+      },
+      "loans": {
+        "title": "My Loans",
+        "request_new": "Request New Loan",
+        "empty": "You don't have any loans yet. Click \"Request New Loan\" to apply for one.",
+        "fields": {
+          "loan_number": "Loan Number",
+          "serial_number": "Serial Number",
+          "principal": "Principal",
+          "interest_rate": "Interest Rate",
+          "tenure": "Tenure",
+          "start_date": "Start Date",
+          "maturity_date": "Maturity Date",
+          "outstanding": "Outstanding",
+          "paid": "Paid",
+          "rejection_reason": "Rejection Reason"
+        },
+        "status": {
+          "PENDING_APPROVAL": "Pending Approval",
+          "REJECTED": "Rejected",
+          "ACTIVE": "Approved / Active",
+          "CLOSED": "Closed",
+          "DEFAULTED": "Defaulted"
+        },
+        "payoff_calculator": {
+          "title": "Payoff Calculator",
+          "calculate_till": "Calculate payoff till date:",
+          "days_passed": "Days Passed",
+          "prorated_principal": "Prorated Principal",
+          "interest_till_date": "Interest till date",
+          "total_to_pay": "Total to Pay"
+        },
+        "monthly_breakdown": {
+          "title": "Monthly Payment Schedule",
+          "summary": "Loan Summary",
+          "table": {
+            "month": "Month",
+            "principal_paid": "Principal Paid",
+            "interest_paid": "Interest Paid",
+            "total_payment": "Total Payment",
+            "remaining_balance": "Remaining Balance"
+          }
+        },
+        "actions": {
+          "view_details": "View Details",
+          "breakdown": "Breakdown"
+        }
+      },
+      "profile": {
+        "title": "My Profile",
+        "change_password": "Change Password",
+        "edit_profile": "Edit Profile",
+
+        "fields": {
+          "username": "Username",
+          "email": "Email",
+          "phone": "Phone Number",
+          "full_name": "Full Name",
+          "address": "Address",
+          "occupation": "Occupation",
+          "annual_income": "Annual Income",
+          "id_proof": "ID Proof",
+          "account_status": "Account Status"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "not_provided": "Not provided",
+        "password_modal": {
+          "title": "Change Password",
+          "current": "Current Password",
+          "new": "New Password",
+          "confirm": "Confirm New Password",
+          "success": "Password changed successfully!",
+          "error": {
+            "mismatch": "New passwords do not match",
+            "failed": "Failed to change password"
+          }
+        }
+      }
+    }
+  }
+}

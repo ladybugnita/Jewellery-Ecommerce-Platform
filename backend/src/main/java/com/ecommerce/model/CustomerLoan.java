@@ -13,6 +13,7 @@ public class CustomerLoan {
     private String id;
     private String customerId;
     private String loanNumber;
+    private String customerSerialNumber;
     private Double principalAmount;
     private Double interestRate;
     private Integer tenureMonths;
@@ -26,4 +27,5 @@ public class CustomerLoan {
     private Double outstandingAmount;
     private LocalDateTime lastPaymentDate;
     private Boolean smsNotifications = true;
+    private String rejectionReason;
 }

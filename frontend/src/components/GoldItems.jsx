@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaEdit, FaTrash, FaPlus, FaSearch, FaGem, FaWeight, FaTag } from 'react-icons/fa';
+import { useTranslation } from 'react-i18next';
+import { FaEdit, FaTrash, FaPlus, FaSearch, FaGem, FaWeight, FaTag, FaCamera } from 'react-icons/fa'; 
 import './GoldItems.css';
+import { useNepaliNumber } from '../hooks/useNepaliNumber';
+import { 
+  formatCurrency, 
+  formatWeight, 
+  toNepaliDigits,
+  toEnglishDigits 
+} from '../utils/nepaliFormat';
+import WebcamCapture from './WebcamCapture'; 
+import api from '../services/api';
 
 const GoldItems = ({ token }) => {
+  const { t, i18n } = useTranslation();
+  const currentLng = i18n.language;
+  const { convertNumber, convertCurrency: convertCurrencyHook, convertWeight: convertWeightHook } = useNepaliNumber();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [customers, setCustomers] = useState([]);
+  const [showWebcam, setShowWebcam] = useState(false);
   const [formData, setFormData] = useState({
     customerId: '',
     itemType: 'Necklace',
     weightInGrams: '',
     purity: '22K',
     description: '',
-    estimatedValue: ''
+    estimatedValue: '',
+    loanNumber: '',
+    imageUrl: '' 
   });
 
   useEffect(() => {
@@ -26,7 +42,7 @@ const GoldItems = ({ token }) => {
 
   const fetchGoldItems = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/admin/gold-items', {
+      const response = await api.get('/admin/gold-items', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setItems(response.data.data || []);
@@ -39,7 +55,7 @@ const GoldItems = ({ token }) => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/admin/customers', {
+      const response = await api.get('/admin/customers', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setCustomers(response.data.data || []);
@@ -49,21 +65,43 @@ const GoldItems = ({ token }) => {
   };
 
   const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const englishValue = toEnglishDigits(value);
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: englishValue
     });
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData({ ...formData, imageUrl: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleWebcamCapture = (imageBase64) => {
+    setFormData({ ...formData, imageUrl: imageBase64 });
+  };
+
+  const displayValue = (value) => {
+    if (value === null || value === undefined || value === '') return '';
+    return currentLng === 'ne' ? toNepaliDigits(value.toString()) : value.toString();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingItem) {
-        await axios.put(`http://localhost:8080/api/admin/gold-items/${editingItem.id}`, formData, {
+        await api.put(`/admin/gold-items/${editingItem.id}`, formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        await axios.post('http://localhost:8080/api/admin/gold-items', formData, {
+        await api.post('/admin/gold-items', formData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
@@ -76,9 +114,9 @@ const GoldItems = ({ token }) => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this gold item?')) {
+    if (window.confirm(t('gold_items.confirm_delete'))) {
       try {
-        await axios.delete(`http://localhost:8080/api/admin/gold-items/${id}`, {
+        await api.delete(`/admin/gold-items/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         fetchGoldItems();
@@ -96,7 +134,9 @@ const GoldItems = ({ token }) => {
       weightInGrams: item.weightInGrams,
       purity: item.purity,
       description: item.description || '',
-      estimatedValue: item.estimatedValue
+      estimatedValue: item.estimatedValue,
+      loanNumber: item.loanNumber || '',
+      imageUrl: item.imageUrl || '' 
     });
     setShowModal(true);
   };
@@ -109,7 +149,9 @@ const GoldItems = ({ token }) => {
       weightInGrams: '',
       purity: '22K',
       description: '',
-      estimatedValue: ''
+      estimatedValue: '',
+      loanNumber: '',
+      imageUrl: '' 
     });
   };
 
@@ -130,7 +172,8 @@ const GoldItems = ({ token }) => {
   const filteredItems = items.filter(item =>
     item.itemType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     getCustomerName(item.customerId)?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.purity?.toLowerCase().includes(searchTerm.toLowerCase())
+    item.purity?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.loanNumber?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -144,19 +187,19 @@ const GoldItems = ({ token }) => {
   return (
     <div className="gold-items fade-in">
       <div className="list-header">
-        <h1>Gold Items Inventory</h1>
+        <h1>{t('gold_items.title')}</h1>
         <div className="header-actions">
           <div className="search-box">
             <FaSearch className="search-icon" />
             <input
               type="text"
-              placeholder="Search items..."
+              placeholder={t('gold_items.search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button className="add-button" onClick={() => setShowModal(true)}>
-            <FaPlus /> Add Gold Item
+            <FaPlus /> {t('gold_items.add')}
           </button>
         </div>
       </div>
@@ -165,22 +208,22 @@ const GoldItems = ({ token }) => {
         <div className="stat-card">
           <FaGem className="stat-icon" />
           <div className="stat-info">
-            <h3>Total Items</h3>
-            <p>{items.length}</p>
+            <h3>{t('gold_items.stats.total_items')}</h3>
+            <p>{convertNumber(items.length)}</p>
           </div>
         </div>
         <div className="stat-card">
           <FaWeight className="stat-icon" />
           <div className="stat-info">
-            <h3>Total Weight</h3>
-            <p>{items.reduce((sum, item) => sum + (item.weightInGrams || 0), 0).toFixed(2)} g</p>
+            <h3>{t('gold_items.stats.total_weight')}</h3>
+            <p>{convertWeightHook(items.reduce((sum, item) => sum + (item.weightInGrams || 0), 0))}</p>
           </div>
         </div>
         <div className="stat-card">
           <FaTag className="stat-icon" />
           <div className="stat-info">
-            <h3>Total Value</h3>
-            <p>₹{items.reduce((sum, item) => sum + (parseFloat(item.estimatedValue) || 0), 0).toLocaleString()}</p>
+            <h3>{t('gold_items.stats.total_value')}</h3>
+            <p>{convertCurrencyHook(items.reduce((sum, item) => sum + (parseFloat(item.estimatedValue) || 0), 0))}</p>
           </div>
         </div>
       </div>
@@ -188,24 +231,35 @@ const GoldItems = ({ token }) => {
       <div className="items-grid">
         {filteredItems.map(item => (
           <div key={item.id} className="item-card">
+            {item.imageUrl && (
+              <div className="item-image">
+                <img src={item.imageUrl} alt={item.itemType} />
+              </div>
+            )}
             <div className="item-header">
-              <h3>{item.itemType}</h3>
+              <h3>{t(`item_types.${item.itemType}`, item.itemType)}</h3>
               <span className={`status-badge ${getStatusBadgeClass(item.status)}`}>
-                {item.status || 'AVAILABLE'}
+                {t(`gold_items.status.${item.status}`, item.status || 'AVAILABLE')}
               </span>
             </div>
             <div className="item-details">
-              <p><strong>Owner:</strong> {getCustomerName(item.customerId)}</p>
-              <p><strong>Weight:</strong> {item.weightInGrams} g</p>
-              <p><strong>Purity:</strong> {item.purity}</p>
-              <p><strong>Est. Value:</strong> ₹{parseFloat(item.estimatedValue).toLocaleString()}</p>
-              {item.description && <p><strong>Description:</strong> {item.description}</p>}
+              <p><strong>{t('gold_items.fields.owner')}:</strong> {item.customerName || getCustomerName(item.customerId)}</p>
+              {item.loanNumber && (
+              <p>
+              <strong>{t('gold_items.fields.loan_number')}:</strong>{' '}
+              <span className="loan-number-tag">{displayValue(item.loanNumber)}</span>
+              </p>
+            )}
+              <p><strong>{t('gold_items.fields.weight')}:</strong> {convertWeightHook(item.weightInGrams)}</p>
+              <p><strong>{t('gold_items.fields.purity')}:</strong> {currentLng === 'ne' ? toNepaliDigits(item.purity) : item.purity}</p>
+              <p><strong>{t('gold_items.fields.estimated_value')}:</strong> {convertCurrencyHook(item.estimatedValue)}</p>
+              {item.description && <p><strong>{t('gold_items.fields.description')}:</strong> {item.description}</p>}
             </div>
             <div className="item-actions">
-              <button className="edit-btn" onClick={() => handleEdit(item)}>
+              <button className="edit-btn" onClick={() => handleEdit(item)} title={t('customers.edit_action')}>
                 <FaEdit />
               </button>
-              <button className="delete-btn" onClick={() => handleDelete(item.id)}>
+              <button className="delete-btn" onClick={() => handleDelete(item.id)} title={t('customers.delete')}>
                 <FaTrash />
               </button>
             </div>
@@ -216,8 +270,33 @@ const GoldItems = ({ token }) => {
       {showModal && (
         <div className="modal">
           <div className="modal-content">
-            <h2>{editingItem ? 'Edit Gold Item' : 'Add New Gold Item'}</h2>
+            <h2>{editingItem ? t('gold_items.edit') : t('gold_items.add_new')}</h2>
+            {formData.loanNumber && (
+              <div className="loan-association-info">
+                <strong>{t('gold_items.fields.customer_loan_serial')}:</strong> <span className="loan-number-tag">{displayValue(formData.loanNumber)}</span>
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
+              <div className="form-row">
+                <div className="image-upload-group" style={{ width: '100%', marginBottom: '10px' }}>
+                  <label>{t('gold_items.fields.image', 'Gold Image')}</label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {formData.imageUrl && (
+                      <img src={formData.imageUrl} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px' }} />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" onClick={() => setShowWebcam(true)} className="camera-btn">
+                      <FaCamera /> {t('common.capture', 'Capture')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="form-row">
                 <select
                   name="customerId"
@@ -225,7 +304,7 @@ const GoldItems = ({ token }) => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select Customer</option>
+                  <option value="">{t('loans.select_customer')}</option>
                   {customers.map(customer => (
                     <option key={customer.id} value={customer.id}>
                       {customer.fullName} ({customer.email})
@@ -239,24 +318,23 @@ const GoldItems = ({ token }) => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="Necklace">Necklace</option>
-                  <option value="Ring">Ring</option>
-                  <option value="Earring">Earring</option>
-                  <option value="Bracelet">Bracelet</option>
-                  <option value="Chain">Chain</option>
-                  <option value="Coin">Coin</option>
-                  <option value="Other">Other</option>
+                  <option value="Necklace">{t('item_types.Necklace')}</option>
+                  <option value="Ring">{t('item_types.Ring')}</option>
+                  <option value="Earring">{t('item_types.Earring')}</option>
+                  <option value="Bracelet">{t('item_types.Bracelet')}</option>
+                  <option value="Chain">{t('item_types.Chain')}</option>
+                  <option value="Coin">{t('item_types.Coin')}</option>
+                  <option value="Other">{t('item_types.Other')}</option>
                 </select>
               </div>
 
               <div className="form-row">
                 <input
-                  type="number"
+                  type="text"
                   name="weightInGrams"
-                  placeholder="Weight (grams)"
-                  value={formData.weightInGrams}
+                  placeholder={t('gold_items.fields.weight')}
+                  value={displayValue(formData.weightInGrams)}
                   onChange={handleInputChange}
-                  step="0.01"
                   required
                 />
 
@@ -276,10 +354,10 @@ const GoldItems = ({ token }) => {
 
               <div className="form-row">
                 <input
-                  type="number"
+                  type="text"
                   name="estimatedValue"
-                  placeholder="Estimated Value (₹)"
-                  value={formData.estimatedValue}
+                  placeholder={t('gold_items.fields.estimated_value')}
+                  value={displayValue(formData.estimatedValue)}
                   onChange={handleInputChange}
                   required
                 />
@@ -288,7 +366,7 @@ const GoldItems = ({ token }) => {
               <div className="form-row">
                 <textarea
                   name="description"
-                  placeholder="Description (optional)"
+                  placeholder={t('gold_items.fields.description')}
                   value={formData.description}
                   onChange={handleInputChange}
                   rows="3"
@@ -300,15 +378,22 @@ const GoldItems = ({ token }) => {
                   setShowModal(false);
                   resetForm();
                 }}>
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" className="submit-btn">
-                  {editingItem ? 'Update' : 'Create'}
+                  {editingItem ? t('customers.edit_action') : t('gold_items.add')}
                 </button>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {showWebcam && (
+        <WebcamCapture
+          onCapture={handleWebcamCapture}
+          onClose={() => setShowWebcam(false)}
+        />
       )}
     </div>
   );

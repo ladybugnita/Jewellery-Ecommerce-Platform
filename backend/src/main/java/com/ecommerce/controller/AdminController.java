@@ -63,6 +63,41 @@ public class AdminController {
         List<CustomerLoan> loans = customerLoanService.getCustomerLoans(customerId);
         return ResponseEntity.ok(ApiResponse.success(loans));
     }
+
+    @GetMapping("/customer-loans/pending")
+    public ResponseEntity<ApiResponse<List<CustomerLoan>>> getPendingApprovalLoans() {
+        List<CustomerLoan> pendingLoans = customerLoanService.getPendingApprovalLoans();
+        return ResponseEntity.ok(ApiResponse.success(pendingLoans));
+    }
+
+    @PostMapping("/customer-loans/{id}/approve")
+    public ResponseEntity<ApiResponse<CustomerLoan>> approveLoan(
+            @PathVariable String id,
+            @RequestBody(required = false) java.util.Map<String, Object> payload) {
+        
+        Double principalAmount = null;
+        Double interestRate = null;
+        
+        if (payload != null) {
+            if (payload.containsKey("principalAmount")) {
+                principalAmount = Double.valueOf(payload.get("principalAmount").toString());
+            }
+            if (payload.containsKey("interestRate")) {
+                interestRate = Double.valueOf(payload.get("interestRate").toString());
+            }
+        }
+        
+        CustomerLoan loan = customerLoanService.approveLoan(id, principalAmount, interestRate);
+        return ResponseEntity.ok(ApiResponse.success("Loan approved successfully", loan));
+    }
+
+    @PostMapping("/customer-loans/{id}/reject")
+    public ResponseEntity<ApiResponse<CustomerLoan>> rejectLoan(
+            @PathVariable String id, @RequestBody java.util.Map<String, String> payload) {
+        String reason = payload.get("reason");
+        CustomerLoan loan = customerLoanService.rejectLoan(id, reason);
+        return ResponseEntity.ok(ApiResponse.success("Loan rejected", loan));
+    }
     @PostMapping("/customer-loans/{id}/repayment")
     public ResponseEntity<ApiResponse<CustomerLoan>> processCustomerRepayment(
             @PathVariable String id, @RequestParam Double amount){
@@ -97,6 +132,11 @@ public class AdminController {
             @PathVariable String id, @RequestParam Double amount){
         BankLoan loan = bankLoanService.processBankPayment(id, amount);
         return ResponseEntity.ok(ApiResponse.success("Bank payment processed successfully", loan));
+    }
+    @GetMapping("/bank-loans/{id}/details")
+    public ResponseEntity<ApiResponse<BankLoanDetailsDTO>> getBankLoanWithDetails(@PathVariable String id) {
+        BankLoanDetailsDTO details = bankLoanService.getBankLoanWithDetails(id);
+        return ResponseEntity.ok(ApiResponse.success(details));
     }
     @GetMapping("/customers")
     public ResponseEntity<ApiResponse<List<Customer>>> getAllCustomers(){
@@ -167,23 +207,5 @@ public class AdminController {
                 })
                 .orElseThrow(() -> new RuntimeException("Gold item not found"));
         return ResponseEntity.ok(ApiResponse.success("Gold item updated successfully", updatedItem));
-    }
-    @PostMapping("/users")
-    public ResponseEntity<ApiResponse<User>> createUser(@Valid @RequestBody User user) {
-        user.setRole("ADMIN");
-        User savedUser = userService.createUser(user);
-        return new ResponseEntity<>(
-                ApiResponse.success("User created successfully", savedUser), HttpStatus.CREATED);
-    }
-    @GetMapping("/users")
-    public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
-        List<User> users = userService.getAllUsers();
-        return ResponseEntity.ok(ApiResponse.success(users));
-    }
-    @GetMapping("/users/{id}")
-    public ResponseEntity<ApiResponse<User>> getUserById(@PathVariable String id){
-        User user = userService.getUserById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(ApiResponse.success(user));
     }
 }

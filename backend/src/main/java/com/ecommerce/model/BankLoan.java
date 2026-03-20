@@ -13,6 +13,7 @@ public class BankLoan {
     private String id;
     private String bankName;
     private String loanNumber;
+    private String bankSerialNumber;
     private Double principalAmount;
     private Double interestRate;
     private Integer tenureMonths;
@@ -20,6 +21,7 @@ public class BankLoan {
     private LocalDateTime maturityDate;
     private String status;
     private List<String> pledgedGoldItemIds;
+    private List<String> bankGoldImages;
     private Double totalInterestPayable;
     private Double interestPaidSoFar;
     private Double amountPaidSoFar;

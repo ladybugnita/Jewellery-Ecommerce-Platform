@@ -24,4 +24,6 @@ public class BankLoanRequest {
     private Integer tenureMonths;
 
     private List<String> goldItemIds;
+    private String bankSerialNumber;
+    private List<String> bankGoldImages;
 }

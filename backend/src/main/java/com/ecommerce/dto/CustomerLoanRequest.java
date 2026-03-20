@@ -25,4 +25,7 @@ public class CustomerLoanRequest {
 
     @NotEmpty(message = "At least one gold item must be pledged")
     private List<String> goldItemIds;
+
+    private String customerSerialNumber;
+    private boolean autoGenerateSerialNumber = true;
 }

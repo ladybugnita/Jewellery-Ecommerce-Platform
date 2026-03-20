@@ -35,6 +35,8 @@ public class BankLoanService {
         loan.setInterestPaidSoFar(0.0);
         loan.setAmountPaidSoFar(0.0);
         loan.setOutstandingAmount(request.getPrincipalAmount());
+        loan.setBankSerialNumber(request.getBankSerialNumber());
+        loan.setBankGoldImages(request.getBankGoldImages());
         
         if(request.getGoldItemIds() != null && !request.getGoldItemIds().isEmpty()) {
             loan.setPledgedGoldItemIds(request.getGoldItemIds());
@@ -92,6 +94,42 @@ public class BankLoanService {
         return activeLoans.stream()
                 .mapToDouble(BankLoan::getOutstandingAmount)
                 .sum();
+    }
+
+    public BankLoanDetailsDTO getBankLoanWithDetails(String id) {
+        BankLoan loan = getBankLoanById(id);
+        
+        List<GoldItemCalculationDTO> calculations = loan.getPledgedGoldItemIds().stream()
+            .map(itemId -> {
+                GoldItem item = goldItemRepository.findById(itemId).orElse(null);
+                if (item == null) return null;
+                
+                double proportion = item.getEstimatedValue() / 
+                    loan.getPledgedGoldItemIds().stream()
+                        .map(id2 -> goldItemRepository.findById(id2).orElse(null))
+                        .filter(i -> i != null)
+                        .mapToDouble(GoldItem::getEstimatedValue)
+                        .sum();
+                
+                return GoldItemCalculationDTO.builder()
+                    .itemId(item.getId())
+                    .itemType(item.getItemType())
+                    .weightInGrams(item.getWeightInGrams())
+                    .purity(item.getPurity())
+                    .estimatedValue(item.getEstimatedValue())
+                    .loanNumber(item.getCustomerSerialNumber()) // This is the customer loan serial number
+                    .allocatedPrincipal(loan.getPrincipalAmount() * proportion)
+                    .allocatedInterest(loan.getTotalInterestPayable() * proportion)
+                    .proportion(proportion)
+                    .build();
+            })
+            .filter(c -> c != null)
+            .toList();
+            
+        return BankLoanDetailsDTO.builder()
+            .loan(loan)
+            .individualGoldCalculations(calculations)
+            .build();
     }
 
     private String generateBankLoanNumber() {

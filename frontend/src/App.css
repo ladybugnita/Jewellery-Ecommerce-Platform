@@ -13,6 +13,11 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+body, .dashboard, .metric-value, .loan-amount, .recent-loan-item,
+.conversion-test, .stat-card, .profit-value, .loan-card {
+  font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif !important;
+}
+
 .App {
   min-height: 100vh;
 }
@@ -84,3 +89,4 @@ body {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
