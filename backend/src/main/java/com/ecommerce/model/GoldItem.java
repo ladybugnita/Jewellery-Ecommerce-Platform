@@ -17,13 +17,17 @@ public class GoldItem {
     private String purity;
     private String description;
     private Double estimatedValue;
-    private String serialNumber;
     private String status;
     private String imageUrl;
-    private String customerLoanId;
-    private String loanNumber;
-    private String customerSerialNumber;
+    private String serialNumber;
     private List<String> billAttachments;
+    private LocalDateTime purchasedDate;
+    private String makingCharge;
+    private Double netWeight;
+    private Double stoneWeight;
+    private String stoneType;
+    private String bankLoanId;
+    private String customerLoanId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

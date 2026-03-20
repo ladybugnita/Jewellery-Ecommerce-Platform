@@ -4,11 +4,15 @@ import com.ecommerce.model.*;
 import com.ecommerce.service.*;
 import com.ecommerce.dto.*;
 import com.ecommerce.repository.GoldItemRepository;
+import com.ecommerce.repository.CustomerRepository;
+import com.ecommerce.service.GoldItemService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import com.ecommerce.dto.UserProfileUpdateRequest;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +29,8 @@ public class UserController {
     private final UserService userService;
     private final CustomerLoanService customerLoanService;
     private final GoldItemRepository goldItemRepository;
+    private final GoldItemService goldItemService;
+    private final CustomerRepository customerRepository;
 
     private String getUserEmail(Authentication authentication) {
         return authentication.getName();
@@ -47,7 +53,23 @@ public class UserController {
         Customer customer = userService.getCustomerByEmail(email);
 
         if (customer == null) {
-            return ResponseEntity.status(404).body(ApiResponse.error("Customer not found"));
+            Optional<User> userOpt = userService.getUserByEmail(email);
+            if (userOpt.isPresent() && "STAFF".equals(userOpt.get().getRole())) {
+                Map<String, Object> staffData = new HashMap<>();
+                long totalCustomers = customerRepository.count();
+                long totalActiveLoans = customerLoanService.getAllActiveLoans().size();
+                long pendingApprovals = customerLoanService.getPendingApprovalLoans().size();
+
+                staffData.put("totalCustomers", totalCustomers);
+                staffData.put("totalActiveLoans", totalActiveLoans);
+                staffData.put("pendingApprovals", pendingApprovals);
+                return ResponseEntity.ok(ApiResponse.success(Map.of("staffData", staffData)));
+            } else {
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("message", "Welcome to your dashboard");
+                userData.put("features", List.of("View profile", "Change password"));
+                return ResponseEntity.ok(ApiResponse.success(userData));
+            }
         }
 
         List<CustomerLoan> loans = customerLoanService.getCustomerLoans(customer.getId());
@@ -67,7 +89,7 @@ public class UserController {
 
         Map<String, String> currentDate = new HashMap<>();
         currentDate.put("english", LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy")));
-        currentDate.put("nepali", "2082/11/27"); // Placeholder for Nepali date
+        currentDate.put("nepali", "2082/11/27");
 
         Map<String, Object> response = new HashMap<>();
         response.put("customerData", customerData);
@@ -91,12 +113,14 @@ public class UserController {
     }
 
     @GetMapping("/my-gold-items")
-    public ResponseEntity<ApiResponse<List<GoldItem>>> getMyGoldItems(Authentication authentication) {
+    public ResponseEntity<ApiResponse<List<GoldItemDetailResponse>>> getMyGoldItems(Authentication authentication) {
         String email = getUserEmail(authentication);
         Customer customer = userService.getCustomerByEmail(email);
-        if (customer == null) return ResponseEntity.status(404).body(ApiResponse.error("Customer not found"));
-
-        return ResponseEntity.ok(ApiResponse.success(goldItemRepository.findByCustomerId(customer.getId())));
+        if (customer == null) {
+            return ResponseEntity.status(404).body(ApiResponse.error("Customer not found"));
+        }
+        List<GoldItemDetailResponse> items = goldItemService.getGoldItemsWithLoanDetails(customer.getId());
+        return ResponseEntity.ok(ApiResponse.success(items));
     }
 
     @PostMapping("/request-loan")
@@ -153,9 +177,9 @@ public class UserController {
         if (userOpt.isEmpty()) return ResponseEntity.status(404).body(ApiResponse.error("User not found"));
 
         String userId = userOpt.get().getId();
-        boolean isAdmin = userOpt.get().getRole().equalsIgnoreCase("ADMIN");
+        boolean isAdmin = userOpt.get().getRole().equals("ADMIN");
         
-        List<Notification> notifications = new ArrayList<>(notificationService.getUserNotifications(userId));
+        List<Notification> notifications = notificationService.getUserNotifications(userId);
         if (isAdmin) {
             notifications.addAll(notificationService.getUserNotifications("ADMIN"));
             notifications.sort(Comparator.comparing(Notification::getCreatedAt).reversed());
@@ -170,7 +194,7 @@ public class UserController {
         if (userOpt.isEmpty()) return ResponseEntity.status(404).body(ApiResponse.error("User not found"));
 
         String userId = userOpt.get().getId();
-        boolean isAdmin = userOpt.get().getRole().equalsIgnoreCase("ADMIN");
+        boolean isAdmin = userOpt.get().getRole().equals("ADMIN");
         
         long count = notificationService.getUnreadCount(userId);
         if (isAdmin) {
@@ -193,5 +217,18 @@ public class UserController {
 
         notificationService.markAllAsRead(userOpt.get().getId());
         return ResponseEntity.ok(ApiResponse.success("All notifications marked as read"));
+    }
+    @PutMapping("/profile")
+    public ResponseEntity<ApiResponse<Customer>> updateProfile(
+            Authentication authentication,
+            @Valid @RequestBody UserProfileUpdateRequest request) {
+        String email = getUserEmail(authentication);
+        Customer customer = userService.getCustomerByEmail(email);
+        if (customer == null) {
+            return ResponseEntity.status(404).body(ApiResponse.error("Customer not found"));
+        }
+
+        Customer updatedCustomer = userService.updateCustomerProfile(customer.getId(), request);
+        return ResponseEntity.ok(ApiResponse.success("Profile updated successfully", updatedCustomer));
     }
 }

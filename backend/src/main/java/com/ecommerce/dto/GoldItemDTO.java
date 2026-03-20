@@ -13,5 +13,5 @@ public class GoldItemDTO {
     private String serialNumber;
     private String imageUrl;
     private List<String> billAttachments;
-    private String customerSerialNumber;
+    private String customerSignature;
 }
