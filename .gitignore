@@ -2,12 +2,15 @@
 **/target/
 *.class
 
+target/
+
 # Node modules
 **/node_modules/
 node_modules/
 
 # Frontend build output
 frontend/build/
+frontend/node_modules/
 
 # IDE files
 .idea/
@@ -39,3 +42,5 @@ dependency-reduced-pom.xml
 # System files
 .DS_Store
 Thumbs.db
+
+*.code-workspace
